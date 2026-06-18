@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>IPP-R — Evolve Consultoría Académica</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f4f7f7;color:#1a2e31;}
+:root{--teal:#1F4045;--teal2:#2a5560;--cream:#EDE5D3;--cream2:#d8cebb;--bg:#f4f7f7;--white:#fff;--gray:#7a9498;--border:#c8d8da;}
+
+/* ── SCREEN WRAPPER ── */
+#app{min-height:100vh;display:flex;flex-direction:column;}
+.screen{display:none;flex:1;flex-direction:column;}
+.screen.active{display:flex;}
+
+/* ── HEADER ── */
+.hdr{background:var(--teal);padding:1rem 1.25rem .85rem;flex-shrink:0;}
+.hdr-logo{font-size:13px;font-weight:600;color:var(--cream);letter-spacing:.18em;margin-bottom:2px;}
+.hdr-sub{font-size:10px;color:var(--cream);opacity:.65;letter-spacing:.06em;}
+
+/* ── WELCOME ── */
+#s-welcome{background:var(--teal);align-items:center;justify-content:center;text-align:center;padding:2rem 1.5rem;}
+.w-globe{margin-bottom:.9rem;}
+.w-brand{font-size:30px;font-weight:600;color:var(--cream);letter-spacing:.2em;margin-bottom:3px;}
+.w-consult{font-size:10px;color:var(--cream);opacity:.7;letter-spacing:.25em;margin-bottom:2rem;}
+.w-divider{width:36px;height:1px;background:var(--cream);opacity:.3;margin:0 auto 1.5rem;}
+.w-title{font-size:17px;font-weight:600;color:var(--cream);margin-bottom:.4rem;}
+.w-desc{font-size:13px;color:var(--cream);opacity:.7;line-height:1.65;max-width:320px;margin:0 auto 2rem;}
+.btn-cream{background:var(--cream);color:var(--teal);border:none;border-radius:10px;padding:14px 40px;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:.03em;}
+.w-note{font-size:11px;color:var(--cream);opacity:.4;margin-top:1.5rem;}
+
+/* ── FORM ── */
+#s-form{background:var(--white);}
+.form-body{flex:1;overflow-y:auto;padding:1rem 1.25rem 1.5rem;}
+.fsec{font-size:10px;font-weight:600;color:var(--gray);letter-spacing:.12em;text-transform:uppercase;margin:.9rem 0 .5rem;}
+.frow{display:grid;gap:8px;margin-bottom:8px;}
+.frow-2{grid-template-columns:1fr 1fr;}
+.frow-1{grid-template-columns:1fr;}
+.ff label{display:block;font-size:11px;color:#4a6468;margin-bottom:3px;font-weight:500;}
+.ff input,.ff select{width:100%;background:#f5f8f8;border:.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;color:#1a2e31;outline:none;appearance:none;-webkit-appearance:none;}
+.ff input:focus,.ff select:focus{border-color:var(--teal);background:#fff;}
+.ff input::placeholder{color:#b0c4c7;}
+.err-msg{font-size:11px;color:#c0392b;margin-top:2px;display:none;}
+.ff.invalid input,.ff.invalid select{border-color:#c0392b;}
+.ff.invalid .err-msg{display:block;}
+.btn-teal{width:100%;background:var(--teal);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;margin-top:1.1rem;letter-spacing:.03em;}
+.btn-teal:active{opacity:.85;}
+
+/* ── INSTRUCTIONS ── */
+#s-instr{background:var(--white);}
+.instr-body{flex:1;overflow-y:auto;padding:1.25rem;}
+.instr-h{font-size:15px;font-weight:600;color:#1a2e31;margin-bottom:.5rem;}
+.instr-p{font-size:13px;color:#4a6468;line-height:1.7;margin-bottom:1rem;}
+.scale-box{border:.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1rem;}
+.sc-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:.5px solid #e8f0f1;}
+.sc-row:last-child{border-bottom:none;}
+.sc-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;flex-shrink:0;}
+.sc-desc{font-size:13px;color:#1a2e31;line-height:1.4;}
+.instr-tip{font-size:12px;color:var(--gray);line-height:1.6;background:#f5f8f8;border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;}
+
+/* ── QUESTION ── */
+#s-question{background:var(--white);}
+.q-hdr{background:var(--teal);padding:.9rem 1.25rem .8rem;flex-shrink:0;}
+.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem;}
+.q-campo-label{font-size:10px;color:var(--cream);opacity:.8;letter-spacing:.04em;}
+.q-counter{font-size:10px;color:var(--cream);opacity:.8;}
+.pbar{height:4px;background:rgba(237,229,211,.2);border-radius:2px;overflow:hidden;}
+.pfill{height:100%;background:var(--cream);border-radius:2px;transition:width .4s ease;}
+.q-body{flex:1;overflow-y:auto;padding:1.25rem 1.25rem 1rem;}
+.q-num-label{font-size:11px;font-weight:600;color:var(--gray);margin-bottom:.5rem;letter-spacing:.04em;}
+.q-text{font-size:14px;color:#1a2e31;line-height:1.7;margin-bottom:1.4rem;}
+.ans-opts{display:flex;flex-direction:column;gap:9px;}
+.ans-btn{display:flex;align-items:center;gap:13px;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;background:var(--white);text-align:left;transition:all .12s;width:100%;}
+.ans-btn:active{transform:scale(.98);}
+.ans-btn.selected{background:var(--teal);border-color:var(--teal);}
+.ans-circle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;transition:all .12s;}
+.ans-label{font-size:13px;color:#1a2e31;line-height:1.4;transition:color .12s;}
+.ans-btn.selected .ans-label{color:var(--cream);}
+.ans-btn.selected .ans-circle{background:rgba(237,229,211,.2)!important;color:var(--cream)!important;}
+.q-nav{display:flex;gap:9px;padding:.85rem 1.25rem 1rem;border-top:.5px solid #e8f0f1;flex-shrink:0;}
+.btn-back{background:var(--teal);color:#fff;border:none;border-radius:9px;padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0;}
+.btn-back:disabled{opacity:.4;cursor:default;}
+.btn-next{flex:1;background:var(--teal);color:#fff;border:none;border-radius:9px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;opacity:.35;pointer-events:none;transition:opacity .2s;}
+.btn-next.on{opacity:1;pointer-events:auto;}
+
+/* ── DONE ── */
+#s-done{background:var(--teal);align-items:center;justify-content:center;text-align:center;padding:2rem 1.5rem;}
+.done-icon{width:60px;height:60px;border-radius:50%;background:rgba(237,229,211,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;}
+.done-title{font-size:20px;font-weight:600;color:var(--cream);margin-bottom:.6rem;}
+.done-sub{font-size:14px;color:var(--cream);opacity:.75;line-height:1.65;max-width:300px;margin:0 auto;}
+
+/* ── RESPONSIVE: tablet/desktop ── */
+@media(min-width:600px){
+  #app{max-width:620px;margin:2rem auto;border-radius:16px;overflow:hidden;box-shadow:0 4px 32px rgba(31,64,69,.12);min-height:auto;}
+  .form-body{max-height:70vh;}
+  .q-body{max-height:60vh;}
+  .frow-2{grid-template-columns:1fr 1fr;}
+  .frow-3{grid-template-columns:1fr 1fr 1fr;}
+  .frow-4{grid-template-columns:1fr 1fr 1fr 1fr;}
+  #s-welcome,#s-done{min-height:500px;}
+}
+@media(min-width:900px){
+  #app{max-width:700px;margin:3rem auto;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ═══════════════ WELCOME ═══════════════ -->
+<div id="s-welcome" class="screen active">
+  <img src="data:image/png;base64,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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAy8j/D+Aq1c3Tl8lcAAAAAElFTkSuQmCC" alt="Evolve Consultoría Académica" style="height:90px;margin-bottom:1.5rem;object-fit:contain;">
+  <div class="w-divider"></div>
+  <div class="w-title">IPP-R</div>
+  <div class="w-desc">Inventario de Intereses y<br>Preferencias Profesionales</div>
+  <button class="btn-cream" onclick="showScreen('s-form')">Comenzar →</button>
+  <div class="w-note">180 preguntas · aproximadamente 15–20 minutos</div>
+</div>
+
+<!-- ═══════════════ FORM ═══════════════ -->
+<div id="s-form" class="screen">
+  <div class="hdr"><div class="hdr-logo">EVOLVE</div><div class="hdr-sub">Datos del estudiante</div></div>
+  <div class="form-body">
+    <div class="fsec">Nombre completo</div>
+    <div class="frow frow-2">
+      <div class="ff" id="ff-pnombre"><label>Primer nombre *</label><input id="f-pnombre" type="text" placeholder="María"><div class="err-msg">Campo requerido</div></div>
+      <div class="ff" id="ff-snombre"><label>Segundo nombre</label><input id="f-snombre" type="text" placeholder="(opcional)"></div>
+    </div>
+    <div class="frow frow-2">
+      <div class="ff" id="ff-apaterno"><label>Apellido paterno *</label><input id="f-apaterno" type="text" placeholder="García"><div class="err-msg">Campo requerido</div></div>
+      <div class="ff" id="ff-amaterno"><label>Apellido materno *</label><input id="f-amaterno" type="text" placeholder="López"><div class="err-msg">Campo requerido</div></div>
+    </div>
+
+    <div class="fsec">Información personal</div>
+    <div class="frow frow-2">
+      <div class="ff" id="ff-fnac"><label>Fecha de nacimiento *</label><input id="f-fnac" type="date"><div class="err-msg">Campo requerido</div></div>
+      <div class="ff" id="ff-edad"><label>Edad *</label><input id="f-edad" type="number" min="10" max="99" placeholder="17"><div class="err-msg">Campo requerido</div></div>
+    </div>
+
+    <div class="fsec">Contacto</div>
+    <div class="frow frow-1">
+      <div class="ff" id="ff-email"><label>Correo electrónico *</label><input id="f-email" type="email" placeholder="correo@ejemplo.com"><div class="err-msg">Ingresa un email válido</div></div>
+    </div>
+    <div class="frow frow-2">
+      <div class="ff" id="ff-tel"><label>Teléfono estudiante *</label><input id="f-tel" type="tel" placeholder="+591 7X XXX XXXX"><div class="err-msg">Campo requerido</div></div>
+      <div class="ff" id="ff-teltutor"><label>Tel. papá / mamá / tutor *</label><input id="f-teltutor" type="tel" placeholder="+591 7X XXX XXXX"><div class="err-msg">Campo requerido</div></div>
+    </div>
+
+    <div class="fsec">Información académica</div>
+    <div class="frow frow-1">
+      <div class="ff" id="ff-colegio"><label>Colegio *</label><input id="f-colegio" type="text" placeholder="Nombre del colegio"><div class="err-msg">Campo requerido</div></div>
+    </div>
+    <div class="frow frow-2">
+      <div class="ff" id="ff-curso"><label>Curso actual *</label><input id="f-curso" type="text" placeholder="4to Secundaria"><div class="err-msg">Campo requerido</div></div>
+      <div class="ff" id="ff-fexamen"><label>Fecha del examen *</label><input id="f-fexamen" type="date"><div class="err-msg">Campo requerido</div></div>
+    </div>
+
+    <button class="btn-teal" onclick="validateForm()">Continuar →</button>
+  </div>
+</div>
+
+<!-- ═══════════════ INSTRUCTIONS ═══════════════ -->
+<div id="s-instr" class="screen">
+  <div class="hdr"><div class="hdr-logo">EVOLVE</div><div class="hdr-sub">Instrucciones</div></div>
+  <div class="instr-body">
+    <div class="instr-h">¿Cómo responder?</div>
+    <div class="instr-p">Lee cada actividad o profesión y selecciona la opción que mejor refleje tu preferencia. No hay respuestas correctas ni incorrectas — responde lo que sientas espontáneamente, sin consultar con nadie.</div>
+    <div class="scale-box">
+      <div class="sc-row">
+        <div class="sc-num" style="background:#e8f0f1;color:#7a9498;">0</div>
+        <div class="sc-desc"><strong>No conozco</strong> esta actividad o profesión</div>
+      </div>
+      <div class="sc-row">
+        <div class="sc-num" style="background:#fde8e8;color:#a33;">1</div>
+        <div class="sc-desc"><strong>No me gusta</strong></div>
+      </div>
+      <div class="sc-row">
+        <div class="sc-num" style="background:#fff3e0;color:#b86a00;">2</div>
+        <div class="sc-desc"><strong>Me es indiferente</strong> o tengo dudas</div>
+      </div>
+      <div class="sc-row">
+        <div class="sc-num" style="background:#e3f4ec;color:#1a6e3a;">3</div>
+        <div class="sc-desc"><strong>Me gusta</strong></div>
+      </div>
+    </div>
+    <div class="instr-tip">💡 El test tiene <strong>180 preguntas</strong> organizadas en 15 áreas profesionales (12 preguntas cada una). Al seleccionar una opción, pasará automáticamente a la siguiente pregunta.</div>
+    <button class="btn-teal" onclick="startTest()">Iniciar el test →</button>
+  </div>
+</div>
+
+<!-- ═══════════════ QUESTION ═══════════════ -->
+<div id="s-question" class="screen">
+  <div class="q-hdr">
+    <div class="q-meta">
+      <div class="q-campo-label" id="q-campo-label">Campo 1</div>
+      <div class="q-counter" id="q-counter">1 / 180</div>
+    </div>
+    <div class="pbar"><div class="pfill" id="pfill" style="width:0%"></div></div>
+  </div>
+  <div class="q-body">
+    <div class="q-num-label" id="q-num-label">Pregunta 1</div>
+    <div class="q-text" id="q-text">...</div>
+    <div class="ans-opts" id="ans-opts">
+      <button class="ans-btn" id="a0" onclick="pickAnswer(0)">
+        <div class="ans-circle" style="background:#e8f0f1;color:#7a9498;">0</div>
+        <div class="ans-label">No conozco esta actividad o profesión</div>
+      </button>
+      <button class="ans-btn" id="a1" onclick="pickAnswer(1)">
+        <div class="ans-circle" style="background:#fde8e8;color:#a33;">1</div>
+        <div class="ans-label">No me gusta</div>
+      </button>
+      <button class="ans-btn" id="a2" onclick="pickAnswer(2)">
+        <div class="ans-circle" style="background:#fff3e0;color:#b86a00;">2</div>
+        <div class="ans-label">Me es indiferente / Tengo dudas</div>
+      </button>
+      <button class="ans-btn" id="a3" onclick="pickAnswer(3)">
+        <div class="ans-circle" style="background:#e3f4ec;color:#1a6e3a;">3</div>
+        <div class="ans-label">Me gusta</div>
+      </button>
+    </div>
+  </div>
+  <div class="q-nav">
+    <button class="btn-back" id="btn-back" onclick="goBack()" disabled>← Atrás</button>
+    <button class="btn-next" id="btn-next" onclick="goNext()">Siguiente →</button>
+  </div>
+</div>
+
+<!-- ═══════════════ DONE ═══════════════ -->
+<div id="s-done" class="screen">
+  <div class="done-icon">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <circle cx="16" cy="16" r="14" stroke="#EDE5D3" stroke-width="1.5" fill="none"/>
+      <polyline points="9,16 14,21 23,11" stroke="#EDE5D3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+  </div>
+  <div class="done-title">¡Test completado!</div>
+  <div class="done-sub">Tus respuestas han sido enviadas correctamente. El equipo de Evolve Consultoría Académica procesará tus resultados y se pondrá en contacto contigo pronto.</div>
+  <div class="w-divider" style="margin-top:2rem;"></div>
+  <div class="w-note" style="margin-top:1rem;">EVOLVE Consultoría Académica</div>
+</div>
+
+</div><!-- #app -->
+
+<script>
+// ══════════════════════════════════════════════
+// CONFIGURATION — change this after deploying the Apps Script
+// ══════════════════════════════════════════════
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby3qt5XL2TkQNbEvX4FSsip_ZMdBtP1HHjW2X0u9VZ54pnJjEbskrXbpLAWZOsdvmNeqg/exec';
+
+// ══════════════════════════════════════════════
+// QUESTION DATA — 15 campos × 12 questions = 180
+// ══════════════════════════════════════════════
+const CAMPOS = [
+  { id:1, name:"Ciencias Naturales", questions:[
+    "Estudiar los seres vivos y realizar trabajos en campo como la Botánica, la Zoología o la Genética. Aplicar sus conocimientos en diversas industrias (sanitaria, alimentaria, conservera, etc.).",
+    "Ser astrónomo/a.",
+    "Trabajar en centros de cultivo de especies acuáticas, vegetales o animales (acuicultura). Investigar para la conservación y preservación de recursos marinos.",
+    "Ser geólogo/a.",
+    "Ser licenciado/a en ciencias del mar.",
+    "Estudiar los fenómenos del firmamento y aplicar estos conocimientos a la navegación o a la utilización del espacio.",
+    "Investigar las propiedades de la materia para los productos de medicina, agricultura y otros.",
+    "Ser químico/a.",
+    "Ser biólogo/a.",
+    "Estudiar la tierra y sus componentes. Tratar de localizar recursos naturales como petróleo, gases y otros minerales, para la explotación.",
+    "Trabajar como ingeniero/a ambiental.",
+    "Dedicarse a la conservación de recursos naturales, aplicando conocimientos científicos sobre el medio ambiente. Analizar los fenómenos meteorológicos y realizar predicciones."
+  ]},
+  { id:2, name:"Ingeniería y Construcción", questions:[
+    "Proyectar edificios y supervisar la construcción de los mismos; proyectar el desarrollo de zonas urbanas; participar en la ordenación estética de los jardines.",
+    "Dirigir la realización material en las obras de construcción de edificios y controlar los materiales empleados en estas. Hacer que las obras se ajusten al proyecto.",
+    "Ser controlador/a aéreo.",
+    "Desarrollar proyectos y trabajos de electrónica aplicados a la industria.",
+    "Diseñar instalaciones relacionadas con las comunicaciones (telefonía, radio, etc.).",
+    "Realizar proyectos para la construcción de puentes, carreteras y aeropuertos.",
+    "Ser ingeniero/a de telecomunicación.",
+    "Ser ingeniero/a de caminos.",
+    "Ser arquitecto/a.",
+    "Ser experto/a en edificación y construcción civil.",
+    "Realizar tareas relacionadas con la seguridad del tráfico aéreo.",
+    "Ser ingeniero/a en electrónica."
+  ]},
+  { id:3, name:"Salud y Medicina", questions:[
+    "Asesorar y tratar a personas con problemas de alimentación, elaborando la dieta adecuada para cada paciente.",
+    "Ser nutricionista.",
+    "Curar algunas enfermedades del aparato locomotor o del sistema nervioso (parálisis, torceduras, etc.) mediante técnicas y medios naturales, mecánicos o físicos.",
+    "Aplicar conocimientos científicos trabajando en laboratorios donde se preparan medicamentos.",
+    "Trabajar como fisioterapeuta.",
+    "Ser enfermero/a.",
+    "Ser farmacéutico/a.",
+    "Aplicar los conocimientos de la anatomía, las funciones y el comportamiento de las personas sanas para establecer el diagnóstico y el tratamiento.",
+    "Aplicar los conocimientos de medicina a tratamientos de enfermedades mentales.",
+    "Ser odontólogo/a.",
+    "Colaborar con el médico en el cuidado de los enfermos.",
+    "Ser médico/a."
+  ]},
+  { id:4, name:"Ciencias Sociales e Historia", questions:[
+    "Analizar e investigar la actuación del hombre en su aspecto social y evolutivo a lo largo del tiempo y difundir estas investigaciones como profesor o escribiendo artículos o libros.",
+    "Ejercer la profesión de historiador/a.",
+    "Estudiar la sociedad, los grupos humanos y sus realizaciones aplicando estos conocimientos en análisis sociológicos.",
+    "Investigar los fundamentos de la religión, analizar textos escritos, restos arqueológicos y tradiciones.",
+    "Ejercer la profesión de trabajador/a social.",
+    "Colaborar con personas o familias para solucionar problemas de tipo social o personal.",
+    "Ejercer la profesión de filólogo/a.",
+    "Interpretar y traducir textos aplicando los conocimientos lingüísticos, teóricos y prácticos.",
+    "Ser teólogo/a.",
+    "Aplicar los conocimientos sobre las distintas manifestaciones artísticas.",
+    "Ejercer la profesión de especialista en arte.",
+    "Ejercer la profesión de sociólogo/a."
+  ]},
+  { id:5, name:"Derecho y Recursos Humanos", questions:[
+    "Ser criminólogo/a.",
+    "Intervenir ante los tribunales de justicia en nombre de la ley, representando a una persona o al estado. Asesorar y defender a personas o entidades en todo lo relativo a sus intereses jurídicos.",
+    "Trabajar como licenciado/a en ciencias del trabajo.",
+    "Ser abogado/a.",
+    "Ser diplomático/a (embajador/a).",
+    "Representar al propio país en otros países.",
+    "Hacer averiguaciones e informar a jueces y policías sobre aspectos relacionados con comportamientos delictivos.",
+    "Representar a empresas, trabajadores o particulares ante los tribunales. Trabajar en asuntos relacionados con la búsqueda de empleo u organización del trabajo.",
+    "Aplicar conocimientos profesionales para resolver problemas relacionados con los trabajadores de una empresa.",
+    "Trabajar en el campo de los Recursos Humanos.",
+    "Trabajar asesorando a las fuerzas de seguridad en temas referentes a comportamientos criminales.",
+    "Trabajar como investigador/a privado."
+  ]},
+  { id:6, name:"Comunicación y Periodismo", questions:[
+    "Trabajar como publicista.",
+    "Buscar y redactar noticias para publicarlas en la prensa escrita o para difundirlas por radio, televisión u otros medios.",
+    "Trabajar como licenciado/a en Comunicación Audiovisual.",
+    "Trabajar como técnico/a de sonido.",
+    "Elaborar la información para presentarla en los medios de comunicación audiovisual.",
+    "Diseñar campañas publicitarias para dar a conocer un producto y lograr su aceptación o para difundir mensajes.",
+    "Obtener imágenes por medio de fotografía y video y presentarlas en cualquier soporte.",
+    "Ser técnico/a en imagen.",
+    "Ser periodista.",
+    "Estudiar los procesos y técnicas de los medios audiovisuales y los elementos que intervienen en ellos.",
+    "Ser director/a realizador/a de medios audiovisuales.",
+    "Registrar, reproducir y captar los sonidos en producciones musicales o de espectáculos de cualquier tipo, garantizando una buena calidad técnica."
+  ]},
+  { id:7, name:"Educación y Psicología", questions:[
+    "Trabajar en la educación de adultos utilizando recursos didácticos y nuevas tecnologías, o en la integración social de personas desadaptadas o con discapacidad.",
+    "Enseñar a alumnos con necesidades especiales (físicas o psíquicas) valorando la situación de cada alumno para adaptar a ese dato la enseñanza.",
+    "Cooperar en la educación de niños de 0 a 3 años contribuyendo a la mejora de sus hábitos de alimentación, higiene y seguridad.",
+    "Trabajar como pedagogo/a.",
+    "Aplicar pruebas psicológicas para evaluar la inteligencia, aptitudes y personalidad de los alumnos.",
+    "Trabajar como maestro/a en educación especial.",
+    "Trabajar como educador/a social.",
+    "Trabajar como psicólogo/a escolar.",
+    "Trabajar como educador/a infantil.",
+    "Analizar las técnicas y métodos de enseñanza para dirigir y organizar centros educativos.",
+    "Impartir las enseñanzas de educación física.",
+    "Enseñar técnicas a niños de educación primaria."
+  ]},
+  { id:8, name:"Economía y Administración", questions:[
+    "Ser gestor/a administrativo.",
+    "Ser administrador/a de fincas e inmuebles.",
+    "Ser economista.",
+    "Realizar trámites (seguros, permisos, etc.) para empresas o particulares.",
+    "Trabajar como licenciado/a en ciencias contables y financieras.",
+    "Comprar, vender o alquilar propiedades (pisos, solares, locales).",
+    "Ser agente de la propiedad inmobiliaria (compraventa de casas, departamentos, etc.).",
+    "Realizar los planes establecidos para la comercialización de productos.",
+    "Ser especialista en gestión comercial y marketing.",
+    "Aplicar los conocimientos técnicos al campo de los seguros.",
+    "Aplicar los conocimientos de economía para resolver problemas prácticos en empresas.",
+    "Establecer comunidades de propietarios, formalizar contratos y elaborar actas de reuniones."
+  ]},
+  { id:9, name:"Informática y Tecnología", questions:[
+    "Realizar tareas de especialista en diversos campos de la informática: programación, análisis y arquitectura de computadores.",
+    "Ser ingeniero/a en informática.",
+    "Aplicar los conocimientos informáticos sobre sistemas operativos y programación en la realización de software de gestión para empresas.",
+    "Ser ingeniero/a técnico en Informática de Gestión.",
+    "Trabajar como Técnico Superior en administración de sistemas informáticos.",
+    "Realizar trabajos de informática aplicada a las comunicaciones.",
+    "Ser especialista en telemática.",
+    "Trabajar en el desarrollo de aplicaciones informáticas.",
+    "Participar en el diseño de aplicaciones informáticas y en su implementación.",
+    "Establecer y manejar los sistemas informáticos de una organización.",
+    "Trabajar como especialista en multimedia.",
+    "Aplicar conocimientos de informática, electrónica y telecomunicaciones para el tratamiento gráfico de datos."
+  ]},
+  { id:10, name:"Agropecuario y Forestal", questions:[
+    "Ser ingeniero/a forestal.",
+    "Organizar explotaciones agrícolas o agropecuarias para obtener mejores variedades de vegetales y mejorar las razas animales. Proyectar maquinaria agrícola.",
+    "Trabajar en explotaciones ganaderas ocupándose de la alimentación e higiene de los animales destinados a la producción de alimentos.",
+    "Trabajar como técnico/a en explotaciones ganaderas (veterinaria).",
+    "Trabajar como técnico/a en explotaciones ganaderas.",
+    "Potenciar los espacios naturales para la conservación de bosques.",
+    "Dirigir fincas para aumentar la productividad de granjas.",
+    "Ser ingeniero/a agrícola.",
+    "Realizar tareas de vigilancia y protección del medio ambiente en bosques, jardines o parques.",
+    "Trabajar como ingeniero/a agrónomo.",
+    "Prevenir, diagnosticar y tratar las enfermedades que padezcan los animales.",
+    "Trabajar como técnico/a en trabajos forestales y conservación del medio ambiente."
+  ]},
+  { id:11, name:"Artes y Diseño", questions:[
+    "Ser dibujante o ilustrador/a de publicaciones.",
+    "Trabajar como diseñador/a de interiores.",
+    "Trabajar como técnico/a en artes plásticas y diseño.",
+    "Diseñar y elaborar productos relacionados con la moda.",
+    "Ser ceramista.",
+    "Ser diseñador/a especialista en moda.",
+    "Crear piezas de cerámica e investigar técnicas con respecto a este trabajo.",
+    "Crear diseños para la mejora de espacios interiores.",
+    "Dibujar o diseñar elementos para la decoración de cerámica.",
+    "Conservar y restaurar bienes culturales (esculturas, cuadros, elementos arqueológicos, documentos) sin alterarlos.",
+    "Trabajar como restaurador/a de bienes culturales.",
+    "Emplear técnicas de ilustración gráfica para realizar ilustraciones en libros."
+  ]},
+  { id:12, name:"Música, Danza y Teatro", questions:[
+    "Formar parte de una orquesta o actuar como solista tocando un instrumento musical (piano, violín, guitarra, etc.).",
+    "Dar recitales o conciertos interpretando canciones clásicas o modernas, actuando como solista o formando parte de un grupo.",
+    "Ser músico/a o instrumentista.",
+    "Ser musicólogo/a.",
+    "Ser cantante.",
+    "Bailar en representaciones públicas interpretando danza clásica o moderna en teatros, festivales, etc.",
+    "Ser bailarín/bailarina.",
+    "Investigar y analizar la historia de la música.",
+    "Ser actor/actriz profesional.",
+    "Actuar en representaciones teatrales interpretando a un personaje.",
+    "Doblar las voces de actores extranjeros para películas de cine o televisión.",
+    "Ser actor/actriz de doblaje."
+  ]},
+  { id:13, name:"Seguridad y Defensa", questions:[
+    "Apagar incendios o prevenirlos, proteger o salvar a las personas en los mismos.",
+    "Rescatar a personas que se encuentren en situaciones problemáticas en el mar, ríos o pantanos. Practicarles primeros auxilios.",
+    "Realizar las tareas necesarias para garantizar la seguridad de los ciudadanos y asegurar el libre ejercicio de las libertades.",
+    "Realizar trabajos técnicos, científicos o de mando relacionados con los fines del ejército, formando parte de este.",
+    "Ser bombero/a.",
+    "Realizar en el ejército trabajos de especialista en mecánica, electricidad, electrónica, etc.",
+    "Trabajar como vigilante de seguridad.",
+    "Ser oficial de carrera del Ejército.",
+    "Trabajar como técnico/a en salvamento acuático.",
+    "Ser policía.",
+    "Custodiar establecimientos y oficinas para evitar robos u otros hechos delictivos.",
+    "Ser especialista del ejército."
+  ]},
+  { id:14, name:"Deporte y Actividad Física", questions:[
+    "Trabajar como animador/a de actividades físicas y deportivas.",
+    "Trabajar como conductor/a de actividades deportivas en el medio natural.",
+    "Trabajar como profesional en ciencias de la actividad física.",
+    "Organizar actividades físicas o deportivas, enseñar juegos o actividades físicas en centros escolares o centros de salud, adaptándolas a las características de los participantes.",
+    "Trabajar como maestro/a especialista en Educación Física.",
+    "Ser técnico/a deportivo.",
+    "Entrenar a deportistas o equipos para perfeccionar sus conocimientos y aptitudes.",
+    "Asesorar sobre aspectos de la actividad física y el deporte en centros escolares.",
+    "Enseñar a realizar un deporte determinado.",
+    "Ser entrenador/a deportivo.",
+    "Utilizar los conocimientos sobre masaje y anatomía humana para ayudar a los deportistas a recuperarse de lesiones.",
+    "Trabajar como masajista deportivo."
+  ]},
+  { id:15, name:"Turismo y Hostelería", questions:[
+    "Trabajar como técnico/a en animación turística.",
+    "Trabajar como técnico/a en turismo.",
+    "Trabajar como técnico/a en información turística.",
+    "Trabajar como técnico/a superior en alojamiento.",
+    "Establecer destinos turísticos, atender y guiar a grupos de visitantes.",
+    "Dirigir o administrar restaurantes; crear productos gastronómicos para ofrecerles a los clientes.",
+    "Trabajar como tripulante de cabina de pasajeros o auxiliar de barco.",
+    "Organizar todo lo necesario para recibir a los clientes del hotel.",
+    "Dirigir a personas o grupos en recorridos por sendero o zonas de montaña.",
+    "Procurar la mejora del turismo incluyendo actividades culturales.",
+    "Atender a los pasajeros en vuelo de líneas aéreas, barcos o cruceros.",
+    "Idear, preparar y dirigir programas de animación cultural, estableciendo las actividades, recursos y documentación necesarios."
+  ]}
+];
+
+// Flatten to 180 questions
+const QUESTIONS = [];
+CAMPOS.forEach(c => c.questions.forEach((q,i) => QUESTIONS.push({campo_id:c.id,campo_name:c.name,q_in_campo:i+1,text:q})));
+
+// Campo recommendation data
+const CAMPO_INFO = {
+  1:{careers:"biólogo/a, químico/a, geólogo/a, oceanógrafo/a, ingeniero/a ambiental",profile:"científico-investigador",trait:"curiosidad por la naturaleza y el entorno"},
+  2:{careers:"ingeniero/a civil, arquitecto/a, ingeniero/a en telecomunicaciones, electrónico/a",profile:"técnico-constructivo",trait:"razonamiento espacial y resolución de problemas técnicos"},
+  3:{careers:"médico/a, enfermero/a, farmacéutico/a, fisioterapeuta, nutricionista",profile:"humanístico-científico orientado a la salud",trait:"vocación de servicio y cuidado de las personas"},
+  4:{careers:"historiador/a, sociólogo/a, trabajador/a social, filólogo/a, especialista en arte",profile:"social e histórico-humanístico",trait:"interés por la sociedad, la cultura y el ser humano"},
+  5:{careers:"abogado/a, criminólogo/a, diplomático/a, especialista en RRHH",profile:"jurídico-social",trait:"sentido de la justicia y las relaciones laborales"},
+  6:{careers:"periodista, publicista, comunicador/a audiovisual, técnico/a de sonido",profile:"creativo-comunicativo",trait:"expresión, creatividad y manejo de medios"},
+  7:{careers:"maestro/a, psicólogo/a escolar, pedagogo/a, educador/a social",profile:"vocacional educativo",trait:"pasión por la enseñanza y el desarrollo humano"},
+  8:{careers:"economista, administrador/a, contador/a, agente inmobiliario, especialista en marketing",profile:"empresarial-administrativo",trait:"pensamiento analítico y gestión de recursos"},
+  9:{careers:"ingeniero/a en informática, desarrollador/a de software, especialista en sistemas",profile:"tecnológico-digital",trait:"afinidad por la tecnología, los sistemas y la programación"},
+  10:{careers:"ingeniero/a agrónomo, forestal, veterinario/a, técnico/a agropecuario",profile:"naturista-técnico",trait:"conexión con el campo, los animales y el medio natural"},
+  11:{careers:"diseñador/a, ilustrador/a, ceramista, restaurador/a de arte, diseñador/a de moda",profile:"creativo-visual",trait:"sensibilidad estética y expresión artística visual"},
+  12:{careers:"músico/a, cantante, bailarín/a, actor/actriz, musicólogo/a",profile:"artístico-expresivo escénico",trait:"vocación por las artes escénicas y la expresión corporal"},
+  13:{careers:"policía, bombero/a, oficial del ejército, técnico/a en salvamento",profile:"de servicio y protección",trait:"espíritu de ayuda, disciplina y protección ciudadana"},
+  14:{careers:"entrenador/a deportivo, profesor/a de EF, técnico/a deportivo, masajista deportivo",profile:"activo-deportivo",trait:"pasión por el movimiento, el deporte y la salud física"},
+  15:{careers:"técnico/a en turismo, guía turístico, director/a de hotel, auxiliar de vuelo",profile:"sociable y dinámico",trait:"gusto por los viajes, la gente y la hospitalidad"}
+};
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+const STATE = {
+  formData: {},
+  currentQ: 0,
+  answers: new Array(180).fill(null),
+  autoAdvanceTimer: null
+};
+
+// ══════════════════════════════════════════════
+// SCREEN NAVIGATION
+// ══════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ══════════════════════════════════════════════
+// FORM VALIDATION
+// ══════════════════════════════════════════════
+const REQUIRED_FIELDS = [
+  {id:'f-pnombre',ff:'ff-pnombre'},
+  {id:'f-apaterno',ff:'ff-apaterno'},
+  {id:'f-amaterno',ff:'ff-amaterno'},
+  {id:'f-fnac',ff:'ff-fnac'},
+  {id:'f-edad',ff:'ff-edad'},
+  {id:'f-email',ff:'ff-email',type:'email'},
+  {id:'f-tel',ff:'ff-tel'},
+  {id:'f-teltutor',ff:'ff-teltutor'},
+  {id:'f-colegio',ff:'ff-colegio'},
+  {id:'f-curso',ff:'ff-curso'},
+  {id:'f-fexamen',ff:'ff-fexamen'}
+];
+
+function validateForm() {
+  let ok = true;
+  REQUIRED_FIELDS.forEach(f => {
+    const el = document.getElementById(f.id);
+    const ff = document.getElementById(f.ff);
+    ff.classList.remove('invalid');
+    const val = el.value.trim();
+    if (!val) { ff.classList.add('invalid'); ok = false; return; }
+    if (f.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+      ff.classList.add('invalid'); ok = false;
+    }
+  });
+  if (!ok) { document.querySelector('.ff.invalid input').focus(); return; }
+  STATE.formData = {
+    primer_nombre: document.getElementById('f-pnombre').value.trim(),
+    segundo_nombre: document.getElementById('f-snombre').value.trim(),
+    apellido_paterno: document.getElementById('f-apaterno').value.trim(),
+    apellido_materno: document.getElementById('f-amaterno').value.trim(),
+    fecha_nacimiento: document.getElementById('f-fnac').value,
+    edad: document.getElementById('f-edad').value,
+    email: document.getElementById('f-email').value.trim(),
+    telefono: document.getElementById('f-tel').value.trim(),
+    telefono_tutor: document.getElementById('f-teltutor').value.trim(),
+    colegio: document.getElementById('f-colegio').value.trim(),
+    curso: document.getElementById('f-curso').value.trim(),
+    fecha_examen: document.getElementById('f-fexamen').value
+  };
+  showScreen('s-instr');
+}
+
+// ══════════════════════════════════════════════
+// TEST LOGIC
+// ══════════════════════════════════════════════
+function startTest() {
+  STATE.currentQ = 0;
+  STATE.answers = new Array(180).fill(null);
+  renderQuestion();
+  showScreen('s-question');
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[STATE.currentQ];
+  const i = STATE.currentQ;
+  document.getElementById('q-campo-label').textContent = 'Campo ' + q.campo_id + ' — ' + q.campo_name;
+  document.getElementById('q-counter').textContent = (i+1) + ' / 180';
+  document.getElementById('q-num-label').textContent = 'Pregunta ' + (i+1);
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('pfill').style.width = (i/180*100) + '%';
+
+  // Clear selection
+  [0,1,2,3].forEach(v => document.getElementById('a'+v).classList.remove('selected'));
+
+  // Restore previous answer if going back
+  const prev = STATE.answers[i];
+  if (prev !== null) {
+    document.getElementById('a'+prev).classList.add('selected');
+    document.getElementById('btn-next').classList.add('on');
+  } else {
+    document.getElementById('btn-next').classList.remove('on');
+  }
+
+  // Back button
+  document.getElementById('btn-back').disabled = (i === 0);
+}
+
+function pickAnswer(val) {
+  clearTimeout(STATE.autoAdvanceTimer);
+  STATE.answers[STATE.currentQ] = val;
+  [0,1,2,3].forEach(v => document.getElementById('a'+v).classList.remove('selected'));
+  document.getElementById('a'+val).classList.add('selected');
+  document.getElementById('btn-next').classList.add('on');
+
+  // Auto-advance after 600ms
+  STATE.autoAdvanceTimer = setTimeout(() => goNext(), 600);
+}
+
+function goNext() {
+  clearTimeout(STATE.autoAdvanceTimer);
+  if (STATE.answers[STATE.currentQ] === null) return;
+  if (STATE.currentQ < 179) {
+    STATE.currentQ++;
+    renderQuestion();
+    document.getElementById('q-body') && document.getElementById('q-body').scrollTo && document.getElementById('q-body').scrollTo(0,0);
+  } else {
+    submitTest();
+  }
+}
+
+function goBack() {
+  clearTimeout(STATE.autoAdvanceTimer);
+  if (STATE.currentQ > 0) { STATE.currentQ--; renderQuestion(); }
+}
+
+// ══════════════════════════════════════════════
+// SCORING & SUBMISSION
+// ══════════════════════════════════════════════
+function calculateScores() {
+  const scores = {};
+  CAMPOS.forEach(c => scores[c.id] = 0);
+  STATE.answers.forEach((ans,i) => { if (ans !== null) scores[QUESTIONS[i].campo_id] += ans; });
+  return scores;
+}
+
+function getTopCampos(scores) {
+  return Object.entries(scores).map(([id,sc]) => ({id:parseInt(id),score:sc,name:CAMPOS[parseInt(id)-1].name}))
+    .sort((a,b) => b.score - a.score);
+}
+
+function generateRecommendation(ranked) {
+  const t = ranked[0], s = ranked[1], th = ranked[2];
+  const ti = CAMPO_INFO[t.id], si = CAMPO_INFO[s.id], thi = CAMPO_INFO[th.id];
+  return `Tu perfil muestra una marcada afinidad por el área de ${t.name} (puntuación: ${t.score}/36), con alto interés en roles como ${ti.careers}. Se observa ${ti.trait} como característica principal de tu perfil ${ti.profile}. Complementariamente, presentas interés en ${s.name} y ${th.name}, lo que sugiere un perfil versátil con capacidad para desarrollarte en entornos que combinen ${ti.trait} con ${si.trait}.`;
+}
+
+function submitTest() {
+  const scores = calculateScores();
+  const ranked = getTopCampos(scores);
+  const top3 = ranked.slice(0,3).map(c => 'C'+c.id+' '+c.name).join(' › ');
+
+  const payload = {
+    ...STATE.formData,
+    timestamp: new Date().toISOString(),
+    answers: STATE.answers,
+    campo_scores: CAMPOS.map(c => ({campo:c.id, name:c.name, score:scores[c.id]})),
+    top_campos: top3,
+    recommendation: generateRecommendation(ranked)
+  };
+
+  // Submit via GET to avoid CORS (no-cors fetch)
+  const url = SCRIPT_URL + '?action=submit&data=' + encodeURIComponent(JSON.stringify(payload));
+  fetch(url, {mode:'no-cors'}).catch(()=>{});
+
+  showScreen('s-done');
+}
+</script>
+</body>
+</html>
